@@ -4,21 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "start":"node src/app.js",
+    "start": "node src/app.js",
     "dev": "nodemon src/app.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/magneto-09/DevTinder.git"
+    "url": "https://github.com/magneto-09/devTinderBE.git"
   },
   "author": "Sharma",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/magneto-09/DevTinder/issues"
-  },
-  "homepage": "https://github.com/magneto-09/DevTinder#readme",
   "dependencies": {
-    "express": "^4.21.2"
+    "colors": "^1.4.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.13.2"
   }
 }
