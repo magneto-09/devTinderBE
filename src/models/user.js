@@ -17,6 +17,14 @@ const userSchema = new mongoose.Schema({
         required:true,
         unique:true
     },
+    password:{
+        type:String, 
+        required:true, 
+    },
+    byPass:{
+        type:String,
+        required:true,  // security question Answer for password updatation. 
+    },
     phone:{
         type:Number,
         required:true

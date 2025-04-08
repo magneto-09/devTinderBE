@@ -8,29 +8,20 @@ const app = express();
 dotenv.config(); // loads all environment Variables
 
 
+// middlewares
+app.use(express.json()); // parse the incoming raw json and attach the parsed data (JS obj) to req.body. 
+// Global middlware. hence, works for each controller defined in this file or other files. 
+
 // routes
-const { userModel: User } = require('./models/user');
+const { signupController, loginController, updateController, deleteController } = require('./controllers/userAuthController')
 
-app.post('/signup', async (_, res, next) => {
-    const userObj = {
-        firstName: 'Piyush',
-        lastName: 'Sharma',
-        email: 'spiyush1721@gmail.com',
-        phone: 9123118239,
-        age: 23
-    }
+app.post('/signup', signupController)
 
-    const newUser = new User(userObj); //instance of model --> document
+app.get('/login', loginController);
 
-    try {
-        await newUser.save();
-        console.log('User added successfully'.bgGreen.white)
-        res.status(200).send(JSON.stringify(userObj));
-    } catch (error) {
-        console.log(`Error occured. ${error}`.bgRed.yellow)
-        next(error);
-    }
-})
+app.patch('/updatePassword', updateController)
+
+app.delete('/dropUser', deleteController);
 
 
 // Home route to indicate server is working perfectly fine. 
