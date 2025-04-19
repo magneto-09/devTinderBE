@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const JWT = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema(
   {
@@ -26,12 +28,12 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minLength: [8, "Password must be of 8 characters atleast!!!!!"],
+      minLength: 8,
     },
     byPass: {
       type: String,
       required: true, // security question's Answer for password updatation. Question -> Hobby
-      minLength: [3],
+      minLength: 3,
       trim: true,
     },
     phone: {
@@ -56,7 +58,6 @@ const userSchema = new mongoose.Schema(
     },
     photoURL: {
       type: String,
-      trim: true,
       default: function () {
         if (this?.gender === "Male")
           return "https://res.cloudinary.com/do5v3ss5j/image/upload/v1744469169/Male_vjshxu.png";
@@ -65,6 +66,7 @@ const userSchema = new mongoose.Schema(
         else
           return "https://res.cloudinary.com/do5v3ss5j/image/upload/v1744469169/Others_tyisa2.png";
       },
+      trim: true,
     },
   },
   {
@@ -72,6 +74,37 @@ const userSchema = new mongoose.Schema(
     // by default --> strict:true -> it doesn't allow fields not present in schema.
   }
 );
+
+// ------------------------- Schema methods to encapusalte few logics. ------------------------------
+userSchema.methods.validatePassword = async function (receivedPassword) {
+  const isValidated = await bcrypt?.compare(receivedPassword, this.password);
+
+  return isValidated; // this will be wrapped in a promise. (async-await basics)
+};
+
+userSchema.methods.generateAccessToken = function () {
+  const payload = {
+    _id: this?._id,
+  };
+
+  const token = JWT?.sign(payload, process.env.ACCESS_TOKEN_JWT_SECRET, {
+    expiresIn: "15m",
+  });
+  return token;
+};
+
+userSchema.methods.generateRefreshToken = function () {
+  const payload = {
+    _id: this?._id,
+  };
+
+  const token = JWT?.sign(payload, process.env.REFRESH_TOKEN_JWT_SECRET, {
+    expiresIn: "1d",
+  });
+
+  return token;
+};
+// ----------------------------------------------------------------------------------------------
 
 const userModel = mongoose.model("user", userSchema); // JS wrapper around schema. Constructor
 

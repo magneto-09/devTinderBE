@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const { connectDB } = require("./config/db");
 require("colors"); // for colorful clg(s)
+const cookieParser = require("cookie-parser");
 
 const { router: userRouter } = require("./routes/userRoutes");
 
@@ -12,6 +13,8 @@ dotenv.config(); // loads all environment Variables
 // middlewares
 app.use(express.json()); // parse the incoming raw json and attach the parsed data (JS obj) to req.body.
 // Global middlware. hence, works for each controller defined in this file or other files.
+
+app.use(cookieParser()); // to read the cookies using req.cookies
 
 // routes
 app.use("/api/v1/auth", userRouter);

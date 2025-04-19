@@ -1,3 +1,5 @@
+const loginAllowedFields = ["email", "password"];
+
 const updateProfileAllowedFields = [
   "firstName",
   "lastName",
@@ -7,7 +9,7 @@ const updateProfileAllowedFields = [
   "photoURL",
 ];
 
-
 module.exports = {
-    updateProfileAllowedFields
-}
+  updateProfileAllowedFields,
+  loginAllowedFields,
+};
