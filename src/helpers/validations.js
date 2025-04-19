@@ -1,6 +1,9 @@
 const validator = require("validator");
 
-const { updateProfileAllowedFields: ALLOWED_FIELDS } = require("./enums");
+const {
+  updateProfileAllowedFields: UPDATE_ALLOWED_FIELDS,
+  loginAllowedFields: LOGIN_ALLOWED_FIELDS,
+} = require("./enums");
 
 const authSignupValidation = (dataObj) => {
   const {
@@ -44,17 +47,33 @@ const authSignupValidation = (dataObj) => {
   // since, photoURL is optional field, so we've to check if it is coming or not. if yes then check it.
 };
 
-const authUpdateProfileValidation = (receivedObj, receivedQueryParams) => {
-  const { email } = receivedQueryParams;
-  if (!validator?.isEmail(email)) throw new Error("Invalid Email.");
+const authLoginValidation = (receivedObj) => {
+  // user should pass email & password only.
+  const isAllowed = Object?.keys(receivedObj)?.every((k) =>
+    LOGIN_ALLOWED_FIELDS?.includes(k)
+  );
 
+  if (!isAllowed) throw new Error("Invalid Credentials.");
+
+  // make sure user is not passing empty json.
+  if (Object?.keys(receivedObj)?.length === 0)
+    throw new Error("Invalid Credentials.");
+
+  if (!validator?.isEmail(receivedObj?.email))
+    throw new Error("Invalid Credentials.");
+
+  if (!validator?.isStrongPassword(receivedObj?.password))
+    throw new Error("Invalid Credentials.");
+};
+
+const authUpdateProfileValidation = (receivedObj) => {
   // receivedObj --> if no fields are given by the user. hence, no keys
   if (Object?.keys(receivedObj)?.length === 0)
     throw new Error("Add required fileds to update.");
 
   //  if received obj contain allowed fields only.
   const isAllowed = Object?.keys(receivedObj)?.every((k) =>
-    ALLOWED_FIELDS?.includes(k)
+    UPDATE_ALLOWED_FIELDS?.includes(k)
   );
 
   if (!isAllowed) throw new Error("Update Not Allowed.");
@@ -94,27 +113,8 @@ const authUpdateProfileValidation = (receivedObj, receivedQueryParams) => {
   }
 };
 
-const authDeleteProfileValidation = (deleteQueryParams) => {
-  const { email, byPass, password } = deleteQueryParams;
-
-  // checks if deleteQueryParams is not empty. now although if it is empty then it'll found
-  // when fineOne() funcn will run. but it's better to catch it in API level.
-  if (Object?.keys(deleteQueryParams)?.length === 0)
-    throw new Error("Delete operation failed.");
-
-  // protecting from data leaking
-  if (!validator?.isEmail(email)) throw new Error("Delete operation failed.");
-
-  if (!validator?.isAlpha(byPass)) throw new Error("Delete operation failed.");
-
-  if (!validator?.isStrongPassword(password))
-    throw new Error("Delete operation failed."); // checking for valid password
-  // this is for the case where someone is giving password of less than 8 char or not adding 1 alphabet,
-  // and other checks of validator.
-};
-
 module.exports = {
   authSignupValidation,
+  authLoginValidation,
   authUpdateProfileValidation,
-  authDeleteProfileValidation,
 };
