@@ -8,11 +8,11 @@ const {
   getProfileController,
   updateProfileController,
   deleteController,
-} = require("../controllers/userAuthController");
+} = require("../controllers/user-auth/userAuthController");
 
 const {
   newAccessTokenController,
-} = require("../controllers/generateNewAccessTokenController");
+} = require("../controllers/user-auth/generateNewAccessTokenController");
 const { jwtAuth } = require("../middlewares/jwtAuthMiddleware");
 
 // signup API -> POST

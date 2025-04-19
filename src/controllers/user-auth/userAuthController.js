@@ -1,10 +1,10 @@
 require("colors");
-const { userModel: User } = require("../models/user");
+const { userModel: User } = require("../../models/user");
 const {
   authSignupValidation,
   authLoginValidation,
   authUpdateProfileValidation,
-} = require("../helpers/validations");
+} = require("../../helpers/validations");
 const bcrypt = require("bcrypt");
 
 // signUp controller - POST
