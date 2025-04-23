@@ -1,10 +1,12 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const { connectDB } = require("./config/db");
 require("colors"); // for colorful clg(s)
 const cookieParser = require("cookie-parser");
 
 const { router: userRouter } = require("./routes/userRoutes");
+
+// starting the server. connect mongoDB and redisDB at 1st with node app. then listen ot port no.
+const { startServer } = require("./config/startServer");
 
 const app = express();
 
@@ -26,17 +28,22 @@ app.get("/", (_, res) =>
 
 const PORT = process.env.PORT || 7777;
 
-// Always connect your nodeApp with DB at first then make your nodeApp to listen at PORT NO.
-connectDB()
-  .then((connData) => {
-    // using optional chaining
-    console.log(
-      `Connected to mongoDB database ${connData?.connection?.host}`.bgMagenta
-        .white
-    );
+startServer()
+  .then((data) => {
+    data?.map((elem, idx) => {
+      if (idx === 0)
+        console.log(
+          `Connected to mongoDB database ${elem?.connection?.host}`.bgMagenta
+            .white
+        );
+      else if (idx === 1)
+        console.log(
+          `Connected to Redis Instance ${elem?.options?.host}.`.bgGreen.white
+        );
+    });
 
     app.listen(PORT, () =>
       console.log(`Server started listening at PORT No. ${PORT}`.bgWhite.black)
     );
   })
-  .catch((e) => console.log(`Failed to connect to DB. ${e}`.bgRed.yellow));
+  .catch((e) => console.log(e));
