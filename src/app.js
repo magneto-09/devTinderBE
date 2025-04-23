@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 
 const { router: userRouter } = require("./routes/userRoutes");
 
-// starting the server. connect mongoDB and redisDB at 1st with node app. then listen ot port no.
+// starting the server. connect mongoDB and redisDB at 1st with node app. then listen to some port no.
 const { startServer } = require("./config/startServer");
 
 const app = express();
@@ -33,12 +33,12 @@ startServer()
     data?.map((elem, idx) => {
       if (idx === 0)
         console.log(
-          `Connected to mongoDB database ${elem?.connection?.host}`.bgMagenta
-            .white
+          `Connected to mongoDB database ${elem?.connection?.host}`
+            .bgBrightGreen.white
         );
       else if (idx === 1)
         console.log(
-          `Connected to Redis Instance ${elem?.options?.host}.`.bgGreen.white
+          `Connected to Redis Instance ${elem?.options?.host}.`.bgRed.white
         );
     });
 

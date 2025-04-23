@@ -8,6 +8,7 @@ const {
   getProfileController,
   updateProfileController,
   deleteController,
+  logoutProfileController
 } = require("../controllers/user-auth/userAuthController");
 
 const {
@@ -34,6 +35,9 @@ router.patch("/profile", jwtAuth, updateProfileController);
 
 // delete profile API -> DELETE
 router.delete("/profile", jwtAuth, deleteController);
+
+// logout --> user should logout his profile only. -> GET
+router.get('/logoutProfile', jwtAuth, logoutProfileController)
 
 module.exports = {
   router,

@@ -6,6 +6,8 @@ const jwtAuth = (req, _, next) => {
   try {
     const authHeader = req?.headers?.authorization;
 
+    if (!authHeader) throw new Error("Unauthorized Access.");
+
     const accessToken = authHeader?.split(" ")?.[1];
 
     if (!accessToken) throw new Error("Unauthorized Access.");
