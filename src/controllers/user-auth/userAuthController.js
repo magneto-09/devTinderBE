@@ -7,6 +7,8 @@ const {
 } = require("../../helpers/validations");
 const bcrypt = require("bcrypt");
 
+const { connectRedisClient } = require("../../config/redis/redisClient");
+
 // signUp controller - POST
 const signupController = async (req, res, next) => {
   try {
@@ -55,12 +57,25 @@ const loginController = async (req, res, next) => {
         const accessToken = ifUserExists?.generateAccessToken(); // send it as res
         const refreshToken = ifUserExists?.generateRefreshToken(); // store in httpOnly cookies.
 
+        // store in cookies
         res.cookie("refreshToken", refreshToken, {
           httpOnly: true, // cookie will be stored in user's browser but invisible to user.
           path: "/api/v1/auth/newAccessToken",
           maxAge: 24 * 60 * 60 * 1000, // 1d vaildity matching with refreshToken.
         });
 
+        // store refreshToken in redisDB as well for token blacklisting if user logs out.
+        const rediClient = connectRedisClient();
+        if (!rediClient) throw new Error("Redis client is not initialized");
+
+        await rediClient?.set(
+          `refreshToken:UserID:${ifUserExists?._id}`,
+          refreshToken,
+          "EX",
+          24 * 60 * 60
+        );
+
+        // send the access token via response.
         return res.status(200).json({
           message: "Log In Successful",
           accessToken: accessToken,
@@ -140,10 +155,36 @@ const deleteController = async (req, res, next) => {
   }
 };
 
+const logoutProfileController = async (req, res, next) => {
+  try {
+    const userID = req.userID;
+
+    const redisClient = connectRedisClient();
+
+    // 1st delete the refreshToken from redisDB :- token blacklisting.
+    await redisClient?.del(`refreshToken:UserID:${userID}`);
+
+    // 2nd clear the cookie that contains the refreshToken
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      path: "/api/v1/auth/newAccessToken",
+    });
+    // Web browsers and other compliant clients will only clear the cookie if the given options
+    // is identical to those given to res.cookie(), excluding expires and maxAge.
+
+    return res.status(200).json({
+      message: "Logged Out Successfully.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   signupController,
   loginController,
   getProfileController,
   updateProfileController,
   deleteController,
+  logoutProfileController,
 };
